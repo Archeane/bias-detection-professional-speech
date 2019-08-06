@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Bias Speech Detection</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename='chat.css') }}" />
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+
+    <style type="text/css">
+        body {
+            font-family:  Helvetica, Arial, sans-serif;
+            margin: 32px;
+        }
+
+        #power-gauge g.arc {
+            fill: steelblue;
+        }
+
+        #power-gauge g.pointer {
+            fill: #e85116;
+            stroke: #b64011;
+        }
+        
+        #power-gauge g.label text {
+            text-anchor: middle;
+            font-size: 14px;
+            font-weight: bold;
+            fill: #666;
+        }
+
+        /*#sexual_pred, #racial_pred, #religion_pred, #disability_pred{
+            border-style: black
+            border-radius: 10px;
+        }*/
+    </style>
+</head>
+<body>
+    <h1>Bias Detection in Professional Speech</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mesgs">
+                    <div class="msg_history">
+                        <div class="incoming_msg">
+                          <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                          <div class="received_msg">
+                            <div class="received_withd_msg">
+                              <p>Who should we hire?</p>
+                              <span class="time_date"> 11:01 AM    |    June 9</span></div>
+                          </div>
+                        </div>
+                        <!-- <div class="outgoing_msg">
+                          <div class="sent_msg">
+                            <p>Test which is a new approach to have all
+                              solutions</p>
+                            <span class="time_date"> 11:01 AM    |    June 9</span> </div>
+                        </div> -->
+                    </div>
+                    <div class="type_msg">
+                    <div class="input_msg_write">
+                      <input type="text" class="write_msg" id='broadcast_data' placeholder="Type a message" />
+                      <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <h3> Predicted category</h3>
+            <div id="prediction">
+                
+            </div>
+            <br /><br /><br />
+             <h4>Identity Bias Gauge</h4>
+             <div id="power-gauge0"></div>
+        </div>
+    </div>
+    <h2> Detail Predictions </h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Gender/Sexual Orientation</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>Male</p>
+                                    <div id="power-gauge14"></div>
+                                    <p>Female</p>
+                                    <div id="power-gauge7"></div>
+                                    <p>Transgender</p>
+                                    <div id="power-gauge23"></div>
+                                    <p>Other Gender</p>
+                                    <div id="power-gauge17"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Heterosexual</h6>
+                                    <div id="power-gauge8"></div>
+                                    <p>Homosexual</p>
+                                    <div id="power-gauge10"></div>
+                                    <p>Bisexual</p>
+                                    <div id="power-gauge3"></div>
+                                    <p>Other Sexual Orientation</p>
+                                    <div id="power-gauge20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class = "col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Racial</div>
+                        <div class="panel-body">
+                            <h6>Asian</h6>
+                            <div id="power-gauge1"></div>
+                            <p>Black</p>
+                            <div id="power-gauge4"></div>
+                            <p>Latino</p>
+                            <div id="power-gauge13"></div>
+                            <p>White</p>
+                            <div id="power-gauge24"></div>
+                            <p>Other_Race</p>
+                            <div id="power-gauge18"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+            <div class="col-md-8">
+                <div class="panel panel-default">
+                <div class="panel-heading">Religion</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Jewish</p>
+                                <div id="power-gauge12"></div>
+                                <p>Buddhist</p>
+                                <div id="power-gauge5"></div>
+                                <p>Christian</p>
+                                <div id="power-gauge6"></div>
+                                <h5>Hindu</h5>
+                                <div id="power-gauge9"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Muslim</h6>
+                                <div id="power-gauge15"></div>
+                                <h5>Atheist</h5>
+                                <div id="power-gauge2"></div>
+                                <p>Other_religion</p>
+                                <div id="power-gauge19"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Disability</div>
+                    <div class="panel-body">
+                        <p>Learning Disability</p>
+                        <div id="power-gauge11"></div>
+                        <p>Physical Disability</p>
+                        <div id="power-gauge21"></div>
+                        <p>Psychiatric or mental illness</p>
+                        <div id="power-gauge22"></div>
+                        <h5>Other Disability</h5>
+                        <div id="power-gauge16"></div>   
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>    
+    </div>
+    </div>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='d3_gaugue.js') }}"></script>
+    <script type="text/javascript">
+        model_classes = ['identity attack', 'asian', 'atheist', 'bisexual', 'black', 'buddhist', 'christian', 'female', 'heterosexual', 'hindu', 'homosexual', 'learning disability', 'jewish', 'latino', 'male', 'muslim', 'other disability', 'other gender', 'other race', 'other religion', 'other sexual orientation', 'physical disability', 'mental illness', 'transgender', 'white']
+
+        sexual_classes_index = [2,6,7,9,13,16,19,22]
+        racial_classes_index = [0,3,12,23]
+
+        function onDocumentReady() {
+          var powerGauges = [];
+          for(i = 0; i < 25; i++){
+            var powerGauge = gauge('#power-gauge'+i, {
+                size: 150,
+                clipWidth: 150,
+                clipHeight: 150,
+                ringWidth: 20,
+                maxValue: 10,
+                transitionMs: 3000,
+              });
+              powerGauge.render();
+              powerGauges.push(powerGauge);
+          }
+
+          function updateReadings(array) {
+            // just pump in random data here...
+            for(var i = 0; i < array.length; i++){
+                console.log(array[i]*10)
+                powerGauges[i].update(array[i] * 10)
+            }
+            // powerGauge.update(value * 10);
+            // powerGauge1.update(val1 * 10);
+            // powerGauge2.update(val2 * 10);
+          }
+          
+          function createMessage(msg){
+                var container = document.createElement("div")
+                container.setAttribute('class', 'outgoing_msg');
+                var sent_msg = document.createElement('div')
+                sent_msg.setAttribute('class', 'sent_msg');
+                var message = document.createElement('p');
+                message.textContent = msg;
+                var time = document.createElement('span')
+                time.setAttribute('class', 'time_date')
+                time.textContent = new Date();
+
+                sent_msg.append(message, time);
+                container.append(sent_msg)
+                return container
+            }
+
+            namespace = '/test';
+            var socket = io(namespace);
+            socket.on('connect', function() {
+                //socket.emit('my_event', {data: 'I\'m connected!'});
+                console.log('connected!')
+            });
+            socket.on('my_response', function(msg, cb) {
+                $('.msg_history').append(createMessage(msg.data));
+                console.log(msg.prediction)
+                prediction = msg.prediction;
+                
+                prediction_arr = prediction.split(';')
+                console.log(prediction_arr);
+                $('#prediction').empty()
+                for(var i = 0; i < prediction_arr.length; i++){
+                    $('#prediction').append('<p>'+prediction_arr[i]+'<p>')
+                }
+                console.log(msg.prediction_classes)
+                console.log(msg.prediction_classes[0])
+                updateReadings(msg.prediction_classes)
+                //updateReadings(msg.prediction, 0.7, 0.4);
+                //$('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data+'  Predict bias: '+msg.prediction).html());
+                if (cb)
+                    cb();
+            });
+
+            $('.msg_send_btn').on('click', function(event) {
+                socket.emit('my_broadcast_event', {data: $('#broadcast_data').val()});
+                return false;
+            });
+
+        }
+
+        if ( !window.isLoaded ) {
+          window.addEventListener("load", function() {
+            onDocumentReady();
+          }, false);
+        } else {
+          onDocumentReady();
+        }
+        
+    </script>
+    </script>
+</body>
+</html>
